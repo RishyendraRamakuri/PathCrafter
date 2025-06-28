@@ -264,9 +264,9 @@ const CreatePath = () => {
         description: formData.description,
         goals: allGoals,
         preferredDifficulty: formData.preferredDifficulty, // ML service expects this exact field name
-        availableTimePerWeek: Number(formData.availableTimePerWeek), // ML service expects this exact field name
-        durationWeeks: Number(formData.durationWeeks), // ML service expects this exact field name
-        preferredTopics: cleanTopics, // ML service expects this exact field name
+        //availableTimePerWeek: Number(formData.availableTimePerWeek), // ML service expects this exact field name
+        //durationWeeks: Number(formData.durationWeeks), // ML service expects this exact field name
+        //preferredTopics: cleanTopics, // ML service expects this exact field name
       }
 
       // Replace this line:
