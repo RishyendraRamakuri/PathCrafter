@@ -48,7 +48,7 @@ export const UserProvider = ({ children }) => {
         throw new Error("No authentication token found")
       }
 
-      const response = await fetch("http://localhost:5000/api/users/profile", {
+      const response = await fetch("https://pathcrafter-backend.onrender.com/api/users/profile", {
         headers: {
           Authorization: `Bearer ${authToken}`,
           "Content-Type": "application/json",
@@ -79,7 +79,7 @@ export const UserProvider = ({ children }) => {
       setLoading(true)
       setError(null)
 
-      const response = await fetch("http://localhost:5000/api/auth/login", {
+      const response = await fetch("https://pathcrafter-backend.onrender.com/api/users/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -122,7 +122,7 @@ export const UserProvider = ({ children }) => {
       setLoading(true)
       setError(null)
 
-      const response = await fetch("http://localhost:5000/api/auth/register", {
+      const response = await fetch("https://pathcrafter-backend.onrender.com/api/users/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -79,7 +79,7 @@ const Profile = () => {
       if (!token) return
 
       // Fetch user's learning paths using the correct endpoint
-      const response = await fetch("http://localhost:5000/api/ml/paths", {
+      const response = await fetch("https://pathcrafter-backend.onrender.com/api/ml/paths", {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -117,7 +117,7 @@ const Profile = () => {
   const fetchRecentPaths = async () => {
     try {
       const token = localStorage.getItem("token")
-      const response = await fetch("http://localhost:5000/api/ml/paths", {
+      const response = await fetch("https://pathcrafter-backend.onrender.com/api/ml/paths", {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -245,7 +245,7 @@ const Profile = () => {
 
     try {
       const token = localStorage.getItem("token")
-      const response = await fetch("http://localhost:5000/api/users/profile", {
+      const response = await fetch("https://pathcrafter-backend.onrender.com/api/users/profile", {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,

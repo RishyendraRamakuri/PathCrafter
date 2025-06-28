@@ -99,7 +99,7 @@ const Settings = () => {
       }
 
       // Load user profile
-      const response = await fetch("http://localhost:5000/api/users/profile", {
+      const response = await fetch("https://pathcrafter-backend.onrender.com/api/users/profile", {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -160,7 +160,7 @@ const Settings = () => {
 
     try {
       const token = localStorage.getItem("token")
-      const response = await fetch("http://localhost:5000/api/users/profile", {
+      const response = await fetch("https://pathcrafter-backend.onrender.com/api/users/profile", {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -209,7 +209,7 @@ const Settings = () => {
 
     try {
       const token = localStorage.getItem("token")
-      const response = await fetch("http://localhost:5000/api/users/profile", {
+      const response = await fetch("https://pathcrafter-backend.onrender.com/api/users/profile", {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -302,7 +302,7 @@ const Settings = () => {
 
     try {
       const token = localStorage.getItem("token")
-      const response = await fetch("http://localhost:5000/api/users/profile", {
+      const response = await fetch("https://pathcrafter-backend.onrender.com/api/users/profile", {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

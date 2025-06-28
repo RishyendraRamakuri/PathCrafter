@@ -95,7 +95,7 @@ const ViewPaths = () => {
         return
       }
 
-      const response = await fetch("http://localhost:5000/api/ml/paths", {
+      const response = await fetch("https://pathcrafter-backend.onrender.com/api/ml/paths", {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -178,7 +178,7 @@ const ViewPaths = () => {
   const handleDeletePath = async (pathId) => {
     try {
       const token = localStorage.getItem("token")
-      const response = await fetch(`http://localhost:5000/api/ml/paths/${pathId}`, {
+      const response = await fetch(`https://pathcrafter-backend.onrender.com/api/ml/paths/${pathId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

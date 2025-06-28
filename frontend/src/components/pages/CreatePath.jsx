@@ -283,7 +283,7 @@ const CreatePath = () => {
       )
       console.log("===============================")
 
-      const response = await fetch("http://localhost:5000/api/ml/generate-path", {
+      const response = await fetch("https://pathcrafter-backend.onrender.com/api/ml/generate-path", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

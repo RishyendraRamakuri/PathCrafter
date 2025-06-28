@@ -100,7 +100,7 @@ const LearningPathDetails = () => {
       setLoading(true)
       const token = localStorage.getItem("token")
       // Updated API endpoint to match your backend
-      const response = await fetch(`http://localhost:5000/api/learning-paths/${pathId}`, {
+      const response = await fetch(`https://pathcrafter-backend.onrender.com/api/learning-paths/${pathId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -127,7 +127,7 @@ const LearningPathDetails = () => {
     try {
       const token = localStorage.getItem("token")
       // Updated API endpoint to match your backend
-      const response = await fetch(`http://localhost:5000/api/learning-paths/${pathId}/analytics`, {
+      const response = await fetch(`https://pathcrafter-backend.onrender.com/api/learning-paths/${pathId}/analytics`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

@@ -73,7 +73,7 @@ function Dashboard() {
       }
 
       // Updated to use the correct API endpoint
-      const response = await fetch("http://localhost:5000/api/learning-paths", {
+      const response = await fetch("https://pathcrafter-backend.onrender.com/api/learning-paths", {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
