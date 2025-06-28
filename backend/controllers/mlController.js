@@ -2,7 +2,7 @@ import axios from "axios"
 import LearningPath from "../models/LearningPath.js"
 
 // ML Service URL - Enhanced ML service runs on port 5001
-const ML_SERVICE_URL = process.env.ML_SERVICE_URL || "http://localhost:5001"
+const ML_SERVICE_URL = process.env.ML_SERVICE_URL
 
 /**
  * Generate a learning path using the ENHANCED ML service
@@ -25,24 +25,50 @@ export const generateLearningPath = async (req, res) => {
       })
     }
 
-    // Prepare data for ENHANCED ML service - EXACT format expected
-    const mlRequestData = {
-      title,
-      description: description || "",
-      goals: goals || [],
-      preferredDifficulty,
-      availableTimePerWeek: Number(availableTimePerWeek),
-      durationWeeks: Number(durationWeeks),
-      preferredTopics: preferredTopics || [],
+    // 🎯 MAP TO ML SERVICE FORMAT
+    // Your ML service expects: { field, subfield, level }
+    
+    // Smart mapping from title and topics to field/subfield
+    let field = "web-development"  // Default
+    let subfield = "frontend"      // Default  
+    let level = preferredDifficulty.toLowerCase() // "beginner", "intermediate", "advanced"
+
+    // Map based on title or preferredTopics
+    const titleLower = title.toLowerCase()
+    const allTopics = (preferredTopics || []).join(" ").toLowerCase() + " " + titleLower
+
+    // Field mapping
+    if (allTopics.includes("data") || allTopics.includes("machine learning") || allTopics.includes("ai")) {
+      field = "data-science"
+      subfield = allTopics.includes("machine learning") ? "machine-learning" : "data-analysis"
+    } else if (allTopics.includes("mobile") || allTopics.includes("android") || allTopics.includes("ios")) {
+      field = "mobile-development"
+      subfield = allTopics.includes("android") ? "android" : allTopics.includes("ios") ? "ios" : "cross-platform"
+    } else if (allTopics.includes("backend") || allTopics.includes("server") || allTopics.includes("api")) {
+      field = "web-development"
+      subfield = "backend"
+    } else if (allTopics.includes("react") || allTopics.includes("vue") || allTopics.includes("frontend")) {
+      field = "web-development"
+      subfield = "frontend"
+    } else if (allTopics.includes("python") || allTopics.includes("java") || allTopics.includes("javascript")) {
+      field = "programming"
+      subfield = allTopics.includes("python") ? "python" : allTopics.includes("java") ? "java" : "javascript"
     }
 
-    console.log("=== BACKEND DEBUG (Enhanced ML Service) ===")
-    console.log("Received from frontend:", req.body)
-    console.log("Sending to Enhanced ML service:", mlRequestData)
-    console.log("Enhanced ML Service URL:", `${ML_SERVICE_URL}/generate-path`)
-    console.log("==========================================")
+    // 🎯 CORRECT ML REQUEST DATA FORMAT
+    const mlRequestData = {
+      field: field,
+      subfield: subfield,
+      level: level
+    }
 
-    // Call ENHANCED ML service to generate learning path
+    console.log("=== BACKEND DEBUG (Fixed Format) ===")
+    console.log("Received from frontend:", req.body)
+    console.log("Mapped to ML service format:", mlRequestData)
+    console.log("ML Service URL:", `${ML_SERVICE_URL}/generate-path`)
+    console.log("===================================")
+
+    // Call ML service with CORRECT format
     const mlResponse = await axios.post(`${ML_SERVICE_URL}/generate-path`, mlRequestData, {
       timeout: 30000, // 30 second timeout
       headers: {
@@ -52,17 +78,17 @@ export const generateLearningPath = async (req, res) => {
 
     const generatedPath = mlResponse.data
 
-    console.log("=== ENHANCED ML SERVICE RESPONSE ===")
+    console.log("=== ML SERVICE RESPONSE ===")
     console.log("Success:", generatedPath.success)
     console.log("Path ID:", generatedPath.path_id)
     console.log("Resource count:", generatedPath.resource_count)
-    console.log("===================================")
+    console.log("==========================")
 
     if (!generatedPath.success) {
-      throw new Error(generatedPath.message || "Enhanced ML service failed to generate path")
+      throw new Error(generatedPath.message || "ML service failed to generate path")
     }
 
-    // Create learning path in database with ENHANCED content
+    // Create learning path in database
     const learningPath = new LearningPath({
       title,
       description: description || "",
@@ -74,15 +100,14 @@ export const generateLearningPath = async (req, res) => {
       createdBy: userId,
       status: "active",
       mlGenerated: true,
-      mlGeneratedContent: generatedPath.learning_path, // Enhanced content with real resources
+      mlGeneratedContent: generatedPath.learning_path,
     })
 
-    // Save the learning path
     await learningPath.save()
 
     res.status(201).json({
       success: true,
-      message: "Enhanced learning path generated successfully with real resources!",
+      message: "Learning path generated successfully!",
       pathId: learningPath._id,
       path: {
         id: learningPath._id,
@@ -94,43 +119,32 @@ export const generateLearningPath = async (req, res) => {
         domain: learningPath.mlGeneratedContent?.domain || "",
         createdAt: learningPath.createdAt,
       },
-      // Include resource count from enhanced ML service
       resourceCount: generatedPath.resource_count || {},
-      enhancedFeatures: [
-        "Real YouTube video resources",
-        "GitHub project examples",
-        "Dev.to articles",
-        "Comprehensive weekly planning",
-        "Progress tracking milestones",
-        "Smart resource caching",
-      ],
     })
   } catch (error) {
-    console.error("=== ENHANCED ML SERVICE ERROR ===")
-    console.error("Error generating learning path:", error.message)
+    console.error("=== ML SERVICE ERROR ===")
+    console.error("Error:", error.message)
     console.error("Error details:", error.response?.data || error)
-    console.error("=================================")
+    console.error("========================")
 
-    // Handle different error types
     if (error.code === "ECONNREFUSED") {
       return res.status(503).json({
         success: false,
-        message:
-          "Enhanced ML service is currently unavailable. Please make sure enhanced_app.py is running on port 5001.",
+        message: "ML service is currently unavailable.",
       })
     }
 
     if (error.response && error.response.data) {
       return res.status(400).json({
         success: false,
-        message: error.response.data.message || "Failed to generate enhanced learning path",
+        message: error.response.data.message || "Failed to generate learning path",
         details: error.response.data,
       })
     }
 
     res.status(500).json({
       success: false,
-      message: "Internal server error while creating enhanced learning path",
+      message: "Internal server error while creating learning path",
       error: error.message,
     })
   }
