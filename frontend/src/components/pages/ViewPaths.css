@@ -1,0 +1,285 @@
+/* 📚 Fixed ViewPaths Layout with Proper Sidebar/Header Alignment */
+.learning-paths-container {
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.08) 0%,
+    rgba(168, 85, 247, 0.04) 25%,
+    rgba(236, 72, 153, 0.08) 50%,
+    rgba(59, 130, 246, 0.04) 75%,
+    rgba(16, 185, 129, 0.08) 100%
+  );
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  /* Remove all margins and padding - let App.css handle layout */
+  padding: 2rem;
+  width: 100%;
+}
+
+.learning-paths-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 15% 25%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 85% 75%, rgba(236, 72, 153, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.learning-paths-container > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Learning Path Cards */
+.learning-path-card {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 24px !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  overflow: hidden !important;
+  position: relative;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 1px 0
+    rgba(255, 255, 255, 0.1);
+}
+
+.learning-path-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899, #06b6d4);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.learning-path-card:hover::before {
+  opacity: 1;
+}
+
+.learning-path-card:hover {
+  transform: translateY(-12px) scale(1.03) !important;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 1px 0
+    rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Card Content */
+.card-title {
+  font-weight: 700 !important;
+  color: #1e293b !important;
+  font-size: 1.3rem !important;
+  margin-bottom: 1rem !important;
+  background: linear-gradient(135deg, #1e293b, #475569);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.card-text {
+  color: #64748b !important;
+  font-weight: 500 !important;
+  line-height: 1.6;
+  margin-bottom: 1.5rem !important;
+}
+
+/* Progress Bar Styling */
+.path-progress-bar {
+  height: 12px !important;
+  border-radius: 10px !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.path-progress-bar-fill {
+  background: linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899) !important;
+  border-radius: 10px !important;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.path-progress-bar-fill::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 4rem 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.empty-state-message {
+  color: #64748b !important;
+  margin-bottom: 2rem !important;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.empty-state svg {
+  font-size: 4rem !important;
+  color: #6366f1 !important;
+  margin-bottom: 2rem;
+  filter: drop-shadow(0 4px 8px rgba(99, 102, 241, 0.2));
+}
+
+/* Create Path Button */
+.create-path-btn {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+  color: white !important;
+  border: none !important;
+  padding: 1rem 2rem !important;
+  border-radius: 16px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+}
+
+.create-path-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.create-path-btn:hover::before {
+  left: 100%;
+}
+
+.create-path-btn:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 15px 35px rgba(99, 102, 241, 0.4) !important;
+}
+
+/* Dark mode support */
+html[data-theme="dark"] .learning-paths-container,
+body[data-theme="dark"] .learning-paths-container,
+.dark .learning-paths-container {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.9) 50%, rgba(15, 23, 42, 0.95) 100%) !important;
+}
+
+html[data-theme="dark"] .learning-path-card,
+body[data-theme="dark"] .learning-path-card,
+.dark .learning-path-card {
+  background: rgba(30, 41, 59, 0.95) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="dark"] .card-title,
+body[data-theme="dark"] .card-title,
+.dark .card-title {
+  color: #f1f5f9 !important;
+}
+
+html[data-theme="dark"] .card-text,
+body[data-theme="dark"] .card-text,
+.dark .card-text {
+  color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] .empty-state,
+body[data-theme="dark"] .empty-state,
+.dark .empty-state {
+  background: rgba(30, 41, 59, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .learning-paths-container {
+    padding: 1rem !important;
+  }
+
+  .learning-path-card {
+    margin-bottom: 2rem !important;
+  }
+
+  .empty-state {
+    padding: 3rem 1.5rem;
+    min-height: 50vh;
+  }
+
+  .empty-state svg {
+    font-size: 3rem !important;
+  }
+
+  .empty-state-message {
+    font-size: 1.1rem;
+  }
+}
+
+/* Floating Animation */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.learning-path-card:nth-child(odd) {
+  animation: float 6s ease-in-out infinite;
+}
+
+.learning-path-card:nth-child(even) {
+  animation: float 6s ease-in-out infinite reverse;
+}
+
+/* Hover Glow Effect */
+@keyframes glow {
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(99, 102, 241, 0.4);
+  }
+}
+
+.learning-path-card:hover {
+  animation: glow 2s ease-in-out infinite;
+}

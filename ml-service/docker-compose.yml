@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  pathcrafter-ml:
+    build: .
+    container_name: pathcrafter-ml-service
+    ports:
+      - "5001:5001"
+    environment:
+      - YOUTUBE_API_KEY=${AIzaSyCCGwzfHwQexTQLAi9BXHNjNertYOIq460}
+      - GITHUB_TOKEN=${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}
+      - FLASK_ENV=production
+      - PORT=5001
+      - HOST=0.0.0.0
+      - CACHE_DURATION_HOURS=24
+      - LOG_LEVEL=INFO
+    env_file:
+      - .env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:5001/health', timeout=10)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - pathcrafter-network
+
+networks:
+  pathcrafter-network:
+    driver: bridge
+
+volumes:
+  logs:
+    driver: local

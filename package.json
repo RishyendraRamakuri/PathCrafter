@@ -1,0 +1,10 @@
+{
+  "name": "path-crafter",
+  "version": "1.0.0",
+  "scripts": {
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "vercel": "^28.16.0"
+  }
+}

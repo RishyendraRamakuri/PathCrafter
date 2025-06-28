@@ -1,0 +1,316 @@
+/* 🚀 Fixed Dashboard Layout with Proper Sidebar/Header Alignment */
+.dashboard {
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.08) 0%,
+    rgba(168, 85, 247, 0.04) 25%,
+    rgba(236, 72, 153, 0.08) 50%,
+    rgba(59, 130, 246, 0.04) 75%,
+    rgba(16, 185, 129, 0.08) 100%
+  );
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  /* Remove all margins and padding - let App.css handle layout */
+  padding: 2rem;
+  width: 100%;
+}
+
+.dashboard::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.dashboard > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Welcome Header Styling */
+.display-6 {
+  background: linear-gradient(135deg, #1e293b, #475569, #6366f1) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+  margin-bottom: 1rem !important;
+}
+
+.text-muted {
+  color: #64748b !important;
+  font-weight: 500 !important;
+  font-size: 1.1rem !important;
+}
+
+/* Premium Card Styling */
+.card {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 1px 0
+    rgba(255, 255, 255, 0.1) !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  margin-bottom: 2rem !important;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, rgba(99, 102, 241, 0.8), rgba(168, 85, 247, 0.8), rgba(236, 72, 153, 0.8));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+.card:hover {
+  transform: translateY(-8px) scale(1.02) !important;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 1px 0
+    rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Card Headers */
+.card-header {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.05)) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 20px 20px 0 0 !important;
+  padding: 1.5rem 2rem !important;
+}
+
+.card-body {
+  padding: 2rem !important;
+}
+
+/* Stats Cards */
+.card.text-center {
+  background: rgba(255, 255, 255, 0.9) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border-radius: 16px !important;
+  padding: 1.5rem !important;
+}
+
+.card.text-center:hover {
+  background: rgba(255, 255, 255, 0.95) !important;
+  transform: translateY(-5px) scale(1.05) !important;
+}
+
+.card.text-center .card-body {
+  padding: 1.5rem !important;
+}
+
+/* Display Numbers */
+.display-4 {
+  font-size: 2.5rem !important;
+  margin-bottom: 1rem !important;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1)) !important;
+  font-weight: 800 !important;
+}
+
+/* Icon Colors */
+.text-primary {
+  color: #6366f1 !important;
+}
+.text-success {
+  color: #10b981 !important;
+}
+.text-info {
+  color: #06b6d4 !important;
+}
+.text-warning {
+  color: #f59e0b !important;
+}
+
+/* Progress Bars */
+.progress {
+  height: 10px !important;
+  border-radius: 10px !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+  overflow: hidden !important;
+  position: relative !important;
+  margin-bottom: 1rem !important;
+}
+
+.progress-bar {
+  border-radius: 10px !important;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.progress-bar::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Buttons */
+.btn {
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  padding: 0.75rem 1.5rem !important;
+}
+
+.btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn:hover::before {
+  left: 100%;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+  border: none !important;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3) !important;
+  color: white !important;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4) !important;
+  color: white !important;
+}
+
+/* Dark mode support */
+html[data-theme="dark"] .dashboard,
+body[data-theme="dark"] .dashboard,
+.dark .dashboard {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.9) 50%, rgba(15, 23, 42, 0.95) 100%) !important;
+}
+
+html[data-theme="dark"] .card,
+body[data-theme="dark"] .card,
+.dark .card {
+  background: rgba(30, 41, 59, 0.95) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="dark"] .card-header,
+body[data-theme="dark"] .card-header,
+.dark .card-header {
+  background: rgba(15, 23, 42, 0.8) !important;
+}
+
+html[data-theme="dark"] h1,
+html[data-theme="dark"] h2,
+html[data-theme="dark"] h3,
+html[data-theme="dark"] h4,
+html[data-theme="dark"] h5,
+html[data-theme="dark"] h6,
+body[data-theme="dark"] h1,
+body[data-theme="dark"] h2,
+body[data-theme="dark"] h3,
+body[data-theme="dark"] h4,
+body[data-theme="dark"] h5,
+body[data-theme="dark"] h6,
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4,
+.dark h5,
+.dark h6 {
+  color: white !important;
+}
+
+html[data-theme="dark"] .text-muted,
+body[data-theme="dark"] .text-muted,
+.dark .text-muted {
+  color: #9ca3af !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 1rem !important;
+  }
+
+  .display-6 {
+    font-size: 2rem !important;
+  }
+
+  .card {
+    margin-bottom: 1rem !important;
+  }
+
+  .card-body {
+    padding: 1.5rem !important;
+  }
+
+  .card-header {
+    padding: 1rem 1.5rem !important;
+  }
+
+  .display-4 {
+    font-size: 2rem !important;
+  }
+
+  .btn {
+    padding: 0.625rem 1.25rem !important;
+    font-size: 0.875rem !important;
+  }
+}
+
+/* Floating Animation */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.card:nth-child(odd) {
+  animation: float 6s ease-in-out infinite;
+}
+
+.card:nth-child(even) {
+  animation: float 6s ease-in-out infinite reverse;
+}
