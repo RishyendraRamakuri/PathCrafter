@@ -45,7 +45,7 @@ if (config.isDevelopment) {
 // CORS configuration
 app.use(
   cors({
-    origin: config.isDevelopment ? ["http://localhost:3000", "http://localhost:5173", "https://path-crafter-alpha.vercel.app"] : process.env.FRONTEND_URL,
+    origin: config.isDevelopment ? ["http://localhost:3000", "http://localhost:5173", "https://path-crafter-alpha.vercel.app","https://path-crafter-21.vercel.app"] : process.env.FRONTEND_URL,
     credentials: true,
   }),
 )
