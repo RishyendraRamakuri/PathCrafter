@@ -57,9 +57,12 @@ export const generateLearningPath = async (req, res) => {
 
     // 🎯 CORRECT ML REQUEST DATA FORMAT
     const mlRequestData = {
-      field: field,
-      subfield: subfield,
-      level: level
+      title: title,
+      preferredDifficulty: level,
+      availableTimePerWeek: Number(availableTimePerWeek),
+      durationWeeks: Number(durationWeeks),
+      //domain: field,       // Optional
+      //subdomain: subfield 
     }
 
     console.log("=== BACKEND DEBUG (Fixed Format) ===")
