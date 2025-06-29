@@ -300,7 +300,7 @@ function Dashboard() {
                 </p>
               </div>
               <div className="d-flex gap-2">
-                <Button variant="outline-primary" onClick={() => navigate("/view-paths")}>
+                <Button variant="outline-primary" onClick={() => navigate("/viewpaths")}>
                   <Book className="me-2" />
                   View All Paths
                 </Button>

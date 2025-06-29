@@ -261,7 +261,7 @@ const LearningPathDetails = () => {
         <Alert variant="danger">
           <h4>Error Loading Learning Path</h4>
           <p>{error || "Learning path not found"}</p>
-          <Button variant="outline-danger" onClick={() => navigate("/view-paths")}>
+          <Button variant="outline-danger" onClick={() => navigate("/viewpaths")}>
             Back to Learning Paths
           </Button>
         </Alert>
@@ -275,7 +275,7 @@ const LearningPathDetails = () => {
       <Row className="mb-4">
         <Col>
           <div className="d-flex align-items-center mb-3">
-            <Button variant="outline-secondary" onClick={() => navigate("/view-paths")} className="me-3">
+            <Button variant="outline-secondary" onClick={() => navigate("/viewpaths")} className="me-3">
               <ArrowLeft className="me-1" />
               Back
             </Button>
