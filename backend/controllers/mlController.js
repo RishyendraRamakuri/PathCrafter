@@ -1,11 +1,13 @@
 import axios from "axios"
 import LearningPath from "../models/LearningPath.js"
 
-// ML Service URL - Enhanced ML service runs on port 5001
+// ML Service URL with better fallback handling
 const ML_SERVICE_URL = process.env.ML_SERVICE_URL || "http://localhost:5001"
 
+console.log("🔧 ML Service URL:", ML_SERVICE_URL)
+
 /**
- * Generate a learning path using the ENHANCED ML service
+ * Generate a learning path using the ML service
  * @route POST /api/ml/generate-path
  * @access Private
  */
@@ -13,7 +15,7 @@ export const generateLearningPath = async (req, res) => {
   try {
     const userId = req.user._id
 
-    // Extract user input from request body
+    // Extract and validate user input
     const { title, description, goals, preferredDifficulty, availableTimePerWeek, durationWeeks, preferredTopics } =
       req.body
 
@@ -25,7 +27,7 @@ export const generateLearningPath = async (req, res) => {
       })
     }
 
-    // Prepare data for ENHANCED ML service - EXACT format expected
+    // Prepare data for ML service
     const mlRequestData = {
       title,
       description: description || "",
@@ -36,33 +38,68 @@ export const generateLearningPath = async (req, res) => {
       preferredTopics: preferredTopics || [],
     }
 
-    console.log("=== BACKEND DEBUG (Enhanced ML Service) ===")
-    console.log("Received from frontend:", req.body)
-    console.log("Sending to Enhanced ML service:", mlRequestData)
-    console.log("Enhanced ML Service URL:", `${ML_SERVICE_URL}/generate-path`)
-    console.log("==========================================")
+    console.log("=== ML SERVICE REQUEST ===")
+    console.log("URL:", `${ML_SERVICE_URL}/generate-path`)
+    console.log("Data:", JSON.stringify(mlRequestData, null, 2))
+    console.log("========================")
 
-    // Call ENHANCED ML service to generate learning path
-    const mlResponse = await axios.post(`${ML_SERVICE_URL}/generate-path`, mlRequestData, {
-      timeout: 30000, // 30 second timeout
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
+    // Call ML service with better error handling
+    let mlResponse
+    try {
+      mlResponse = await axios.post(`${ML_SERVICE_URL}/generate-path`, mlRequestData, {
+        timeout: 45000, // Increased timeout
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        validateStatus: (status) => {
+          return status < 500 // Don't throw for 4xx errors
+        },
+      })
+    } catch (axiosError) {
+      console.error("❌ Axios Error:", axiosError.message)
+
+      if (axiosError.code === "ECONNREFUSED") {
+        return res.status(503).json({
+          success: false,
+          message: "ML service is currently unavailable. Please try again in a few minutes.",
+        })
+      }
+
+      if (axiosError.code === "ETIMEDOUT") {
+        return res.status(504).json({
+          success: false,
+          message: "ML service request timed out. Please try again.",
+        })
+      }
+
+      throw axiosError
+    }
+
+    console.log("=== ML SERVICE RESPONSE ===")
+    console.log("Status:", mlResponse.status)
+    console.log("Headers:", mlResponse.headers)
+    console.log("Data:", JSON.stringify(mlResponse.data, null, 2))
+    console.log("==========================")
+
+    if (mlResponse.status !== 200) {
+      return res.status(mlResponse.status).json({
+        success: false,
+        message: mlResponse.data?.message || "ML service returned an error",
+        details: mlResponse.data,
+      })
+    }
 
     const generatedPath = mlResponse.data
 
-    console.log("=== ENHANCED ML SERVICE RESPONSE ===")
-    console.log("Success:", generatedPath.success)
-    console.log("Path ID:", generatedPath.path_id)
-    console.log("Resource count:", generatedPath.resource_count)
-    console.log("===================================")
-
     if (!generatedPath.success) {
-      throw new Error(generatedPath.message || "Enhanced ML service failed to generate path")
+      return res.status(400).json({
+        success: false,
+        message: generatedPath.message || "ML service failed to generate path",
+      })
     }
 
-    // Create learning path in database with ENHANCED content
+    // Create learning path in database
     const learningPath = new LearningPath({
       title,
       description: description || "",
@@ -74,15 +111,14 @@ export const generateLearningPath = async (req, res) => {
       createdBy: userId,
       status: "active",
       mlGenerated: true,
-      mlGeneratedContent: generatedPath.learning_path, // Enhanced content with real resources
+      mlGeneratedContent: generatedPath.learning_path,
     })
 
-    // Save the learning path
     await learningPath.save()
 
     res.status(201).json({
       success: true,
-      message: "Enhanced learning path generated successfully with real resources!",
+      message: "Learning path generated successfully!",
       pathId: learningPath._id,
       path: {
         id: learningPath._id,
@@ -94,44 +130,18 @@ export const generateLearningPath = async (req, res) => {
         domain: learningPath.mlGeneratedContent?.domain || "",
         createdAt: learningPath.createdAt,
       },
-      // Include resource count from enhanced ML service
       resourceCount: generatedPath.resource_count || {},
-      enhancedFeatures: [
-        "Real YouTube video resources",
-        "GitHub project examples",
-        "Dev.to articles",
-        "Comprehensive weekly planning",
-        "Progress tracking milestones",
-        "Smart resource caching",
-      ],
     })
   } catch (error) {
-    console.error("=== ENHANCED ML SERVICE ERROR ===")
-    console.error("Error generating learning path:", error.message)
-    console.error("Error details:", error.response?.data || error)
-    console.error("=================================")
-
-    // Handle different error types
-    if (error.code === "ECONNREFUSED") {
-      return res.status(503).json({
-        success: false,
-        message:
-          "Enhanced ML service is currently unavailable. Please make sure enhanced_app.py is running on port 5001.",
-      })
-    }
-
-    if (error.response && error.response.data) {
-      return res.status(400).json({
-        success: false,
-        message: error.response.data.message || "Failed to generate enhanced learning path",
-        details: error.response.data,
-      })
-    }
+    console.error("=== LEARNING PATH GENERATION ERROR ===")
+    console.error("Error:", error.message)
+    console.error("Stack:", error.stack)
+    console.error("=====================================")
 
     res.status(500).json({
       success: false,
-      message: "Internal server error while creating enhanced learning path",
-      error: error.message,
+      message: "Internal server error while creating learning path",
+      error: process.env.NODE_ENV === "development" ? error.message : "Something went wrong",
     })
   }
 }
@@ -351,7 +361,7 @@ export const deleteLearningPath = async (req, res) => {
 }
 
 /**
- * Get available domains from Enhanced ML service
+ * Get available domains from ML service
  * @route GET /api/ml/domains
  * @access Public
  */
@@ -360,17 +370,17 @@ export const getDomains = async (req, res) => {
     const response = await axios.get(`${ML_SERVICE_URL}/domains`)
     res.json(response.data)
   } catch (error) {
-    console.error("Error fetching domains from enhanced ML service:", error)
+    console.error("Error fetching domains from ML service:", error)
     res.status(500).json({
       success: false,
-      message: "Failed to fetch available domains from enhanced ML service",
+      message: "Failed to fetch available domains from ML service",
       error: error.message,
     })
   }
 }
 
 /**
- * Preview resources for a domain/subdomain from Enhanced ML service
+ * Preview resources for a domain/subdomain from ML service
  * @route POST /api/ml/resources/preview
  * @access Private
  */
@@ -379,17 +389,17 @@ export const previewResources = async (req, res) => {
     const response = await axios.post(`${ML_SERVICE_URL}/resources/preview`, req.body)
     res.json(response.data)
   } catch (error) {
-    console.error("Error previewing resources from enhanced ML service:", error)
+    console.error("Error previewing resources from ML service:", error)
     res.status(500).json({
       success: false,
-      message: "Failed to preview resources from enhanced ML service",
+      message: "Failed to preview resources from ML service",
       error: error.message,
     })
   }
 }
 
 /**
- * Health check for Enhanced ML service
+ * Health check for ML service
  * @route GET /api/ml/health
  * @access Public
  */
@@ -398,13 +408,13 @@ export const mlHealthCheck = async (req, res) => {
     const response = await axios.get(`${ML_SERVICE_URL}/health`)
     res.json({
       success: true,
-      service: "Enhanced ML Service",
+      service: "ML Service",
       data: response.data,
     })
   } catch (error) {
     res.status(503).json({
       success: false,
-      message: "Enhanced ML service health check failed",
+      message: "ML service health check failed",
       error: error.message,
     })
   }

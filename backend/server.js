@@ -14,9 +14,9 @@ import mlRoutes from "./routes/mlRoutes.js"
 // Import middleware
 import { generalLimiter } from "./middleware/rateLimiter.js"
 
-// Connect to MongoDB (remove deprecated options)
+// Connect to MongoDB with proper error handling
 try {
-  await mongoose.connect(config.mongoUri)
+  await mongoose.connect(process.env.MONGO_URI || config.mongoUri)
   console.log("✅ MongoDB connected successfully")
 } catch (error) {
   console.error("❌ MongoDB connection error:", error)
@@ -29,14 +29,14 @@ const app = express()
 // Security middleware
 app.use(
   helmet({
-    contentSecurityPolicy: false, // Disable CSP for development
+    contentSecurityPolicy: false,
     crossOriginEmbedderPolicy: false,
   }),
 )
 app.use(compression())
 
 // Logging middleware
-if (config.isDevelopment) {
+if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"))
 } else {
   app.use(morgan("combined"))
@@ -45,7 +45,15 @@ if (config.isDevelopment) {
 // CORS configuration
 app.use(
   cors({
-    origin: config.isDevelopment ? ["http://localhost:3000", "http://localhost:5173", "https://path-crafter-alpha.vercel.app","https://path-crafter-21.vercel.app"] : process.env.FRONTEND_URL,
+    origin:
+      process.env.NODE_ENV === "development"
+        ? [
+            "http://localhost:3000",
+            "http://localhost:5173",
+            "https://path-crafter-alpha.vercel.app",
+            "https://path-crafter-21.vercel.app",
+          ]
+        : process.env.FRONTEND_URL,
     credentials: true,
   }),
 )
@@ -63,7 +71,16 @@ app.get("/health", (req, res) => {
     success: true,
     message: "PathCrafter API is running",
     timestamp: new Date().toISOString(),
-    environment: config.nodeEnv,
+    environment: process.env.NODE_ENV,
+  })
+})
+
+// Root endpoint
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "PathCrafter Backend API",
+    status: "running",
   })
 })
 
@@ -121,27 +138,33 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({
     success: false,
     message: err.message || "Internal server error",
-    error: config.isDevelopment ? err.stack : undefined,
+    error: process.env.NODE_ENV === "development" ? err.stack : undefined,
   })
 })
 
 // Start the server
-const server = app.listen(config.port, () => {
-  console.log(`🚀 Server running on port ${config.port} in ${config.nodeEnv} mode`)
+const PORT = process.env.PORT || 5000
+const server = app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT} in ${process.env.NODE_ENV} mode`)
 })
 
-// Graceful shutdown
-const gracefulShutdown = (signal) => {
+// FIXED: Graceful shutdown without deprecated callback
+const gracefulShutdown = async (signal) => {
   console.log(`\n📡 Received ${signal}. Shutting down gracefully...`)
 
   server.close(() => {
     console.log("✅ HTTP server closed")
-
-    mongoose.connection.close(false, () => {
-      console.log("✅ MongoDB connection closed")
-      process.exit(0)
-    })
   })
+
+  try {
+    // FIXED: Use await instead of callback
+    await mongoose.connection.close()
+    console.log("✅ MongoDB connection closed")
+    process.exit(0)
+  } catch (error) {
+    console.error("❌ Error closing MongoDB:", error)
+    process.exit(1)
+  }
 }
 
 // Handle shutdown signals
