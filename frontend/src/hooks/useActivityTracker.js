@@ -23,7 +23,7 @@ export const useActivityTracker = (pathId) => {
     try {
       const token = localStorage.getItem("token")
       // Updated API endpoint to match your backend
-      await fetch(`http://localhost:5000/api/learning-paths/${pathId}/log-session`, {
+      await fetch(`https://pathcrafter-backend.onrender.com/api/learning-paths/${pathId}/log-session`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

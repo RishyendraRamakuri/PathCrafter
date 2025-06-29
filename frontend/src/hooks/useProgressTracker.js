@@ -17,7 +17,7 @@ export const useProgressTracker = (pathId) => {
     try {
       setLoading(true)
       const token = localStorage.getItem("token")
-      const response = await fetch(`http://localhost:5000/api/learning-paths/${pathId}`, {
+      const response = await fetch(`https://pathcrafter-backend.onrender.com/api/learning-paths/${pathId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -88,7 +88,7 @@ export const useProgressTracker = (pathId) => {
         // Send to backend
         const token = localStorage.getItem("token")
         const response = await fetch(
-          `http://localhost:5000/api/learning-paths/${pathId}/weeks/${weekNumber}/progress`,
+          `https://pathcrafter-backend.onrender.com/api/learning-paths/${pathId}/weeks/${weekNumber}/progress`,
           {
             method: "PUT",
             headers: {
@@ -121,7 +121,7 @@ export const useProgressTracker = (pathId) => {
       try {
         const token = localStorage.getItem("token")
         const response = await fetch(
-          `http://localhost:5000/api/learning-paths/${pathId}/weeks/${weekNumber}/complete`,
+          `https://pathcrafter-backend.onrender.com/api/learning-paths/${pathId}/weeks/${weekNumber}/complete`,
           {
             method: "PUT",
             headers: {
