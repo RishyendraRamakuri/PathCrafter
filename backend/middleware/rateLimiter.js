@@ -26,8 +26,8 @@ export const authLimiter = rateLimit({
 
 // ML generation rate limiter (more restrictive)
 export const mlLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 10, // limit each IP to 10 ML requests per hour
+  windowMs: 15 * 60 * 1000, // 1 hour
+  max: 100, // limit each IP to 10 ML requests per hour
   message: {
     success: false,
     message: "Too many learning path generation requests, please try again later.",

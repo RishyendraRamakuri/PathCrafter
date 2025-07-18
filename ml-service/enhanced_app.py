@@ -12,15 +12,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-app.config['YOUTUBE_API_KEY'] = os.environ.get('YOUTUBE_API_KEY')
-app.config['GITHUB_TOKEN'] = os.environ.get('GITHUB_TOKEN')
-
-@app.route('/health')
-def health():
-    return {
-        "status": "healthy",
-        "youtube_key_configured": bool(app.config['YOUTUBE_API_KEY'])
-    }
 CORS(app)
 
 # Enhanced Learning Content Database with ALL domains from frontend
