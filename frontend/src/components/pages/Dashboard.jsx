@@ -410,7 +410,7 @@ function Dashboard() {
                         <Button
                           variant="outline-primary"
                           size="sm"
-                          onClick={() => navigate("/view-paths")}
+                          onClick={() => navigate("/viewpaths")}
                           className="w-100"
                         >
                           View All {dashboardData.activePaths.length} Active Paths
