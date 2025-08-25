@@ -26,6 +26,9 @@ try {
 // Initialize Express app
 const app = express()
 
+// Trust proxy for Render deployment (fixes rate limiting issues)
+app.set('trust proxy', 1)
+
 // Security middleware
 app.use(
   helmet({

@@ -39,41 +39,61 @@ export const generateLearningPath = async (req, res) => {
     }
 
     console.log("=== ML SERVICE REQUEST ===")
-    console.log("URL:", `${ML_SERVICE_URL}/generate-path`)
+    console.log("URL:", `${ML_SERVICE_URL}`)
     console.log("Data:", JSON.stringify(mlRequestData, null, 2))
     console.log("========================")
 
-    // Call ML service with better error handling
+    // Call ML service with retry logic for 429 errors
     let mlResponse
-    try {
-      mlResponse = await axios.post(`${ML_SERVICE_URL}/generate-path`, mlRequestData, {
-        timeout: 45000, // Increased timeout
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        validateStatus: (status) => {
-          return status < 500 // Don't throw for 4xx errors
-        },
-      })
-    } catch (axiosError) {
-      console.error("❌ Axios Error:", axiosError.message)
-
-      if (axiosError.code === "ECONNREFUSED") {
-        return res.status(503).json({
-          success: false,
-          message: "ML service is currently unavailable. Please try again in a few minutes.",
+    let retryCount = 0
+    const maxRetries = 3
+    
+    while (retryCount <= maxRetries) {
+      try {
+        mlResponse = await axios.post(`${ML_SERVICE_URL}`, mlRequestData, {
+          timeout: 60000, // Increased timeout for ML processing
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          validateStatus: (status) => {
+            return status < 500 // Don't throw for 4xx errors
+          },
         })
-      }
+        
+        // If successful or non-429 error, break the retry loop
+        if (mlResponse.status !== 429) {
+          break
+        }
+        
+        // If 429 and we haven't exceeded max retries, wait and retry
+        if (retryCount < maxRetries) {
+          console.log(`⏳ ML service busy, retrying in ${(retryCount + 1) * 2} seconds... (attempt ${retryCount + 1}/${maxRetries})`)
+          await new Promise(resolve => setTimeout(resolve, (retryCount + 1) * 2000))
+          retryCount++
+        } else {
+          break
+        }
+        
+      } catch (axiosError) {
+        console.error("❌ Axios Error:", axiosError.message)
 
-      if (axiosError.code === "ETIMEDOUT") {
-        return res.status(504).json({
-          success: false,
-          message: "ML service request timed out. Please try again.",
-        })
-      }
+        if (axiosError.code === "ECONNREFUSED") {
+          return res.status(503).json({
+            success: false,
+            message: "ML service is currently unavailable. Please try again in a few minutes.",
+          })
+        }
 
-      throw axiosError
+        if (axiosError.code === "ETIMEDOUT") {
+          return res.status(504).json({
+            success: false,
+            message: "ML service request timed out. The service might be processing a large request. Please try again.",
+          })
+        }
+
+        throw axiosError
+      }
     }
 
     console.log("=== ML SERVICE RESPONSE ===")

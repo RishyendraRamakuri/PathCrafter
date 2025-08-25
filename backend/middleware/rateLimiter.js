@@ -10,30 +10,33 @@ export const generalLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  trustProxy: true, // Important for Render deployment
 })
 
 // Strict rate limiter for auth endpoints
 export const authLimiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 15 minutes
-  max: 50, // limit each IP to 5 requests per windowMs
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 50, // limit each IP to 50 requests per minute
   message: {
     success: false,
     message: "Too many authentication attempts, please try again later.",
   },
   standardHeaders: true,
   legacyHeaders: false,
+  trustProxy: true, // Important for Render deployment
 })
 
 // ML generation rate limiter (more restrictive)
 export const mlLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // 5 minutes
-  max: 10, // limit each IP to 10 ML requests per 5 minutes
+  windowMs: 2 * 60 * 1000, // 2 minutes
+  max: 5, // limit each IP to 5 ML requests per 2 minutes
   message: {
     success: false,
     message: "Too many learning path generation requests, please try again in a few minutes.",
   },
   standardHeaders: true,
   legacyHeaders: false,
+  trustProxy: true, // Important for Render deployment
 })
 
 export default generalLimiter
