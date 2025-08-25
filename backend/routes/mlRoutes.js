@@ -12,6 +12,7 @@ import {
   mlHealthCheck,
 } from "../controllers/mlController.js"
 import protect from "../middleware/authMiddleware.js"
+import { mlLimiter } from "../middleware/rateLimiter.js"
 
 const router = express.Router()
 
@@ -22,8 +23,8 @@ router.get("/domains", getDomains)
 // Apply authentication middleware to all routes below
 router.use(protect)
 
-// Generate a new learning path
-router.post("/generate-path", generateLearningPath)
+// Generate a new learning path (with ML-specific rate limiting)
+router.post("/generate-path", mlLimiter, generateLearningPath)
 
 // Get all learning paths for the authenticated user
 router.get("/paths", getUserLearningPaths)

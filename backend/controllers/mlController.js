@@ -78,15 +78,22 @@ export const generateLearningPath = async (req, res) => {
 
     console.log("=== ML SERVICE RESPONSE ===")
     console.log("Status:", mlResponse.status)
-    console.log("Headers:", mlResponse.headers)
-    console.log("Data:", JSON.stringify(mlResponse.data, null, 2))
+    console.log("Response:", JSON.stringify(mlResponse.data, null, 2))
     console.log("==========================")
+
+    if (mlResponse.status === 429) {
+      return res.status(429).json({
+        success: false,
+        message: "ML service is temporarily busy. Please try again in a few minutes.",
+        details: "Too Many Requests"
+      })
+    }
 
     if (mlResponse.status !== 200) {
       return res.status(mlResponse.status).json({
         success: false,
         message: mlResponse.data?.message || "ML service returned an error",
-        details: mlResponse.data,
+        details: mlResponse.data?.error || mlResponse.statusText,
       })
     }
 
