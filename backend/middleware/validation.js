@@ -4,10 +4,29 @@ import { body, param, query, validationResult } from "express-validator"
 export const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
+    const errorMessages = errors.array()
+    
+    // Group password errors for better user experience
+    const passwordErrors = errorMessages.filter(error => error.path === 'password')
+    const otherErrors = errorMessages.filter(error => error.path !== 'password')
+    
+    let message = "Please fix the following issues:"
+    
+    if (passwordErrors.length > 0) {
+      message = "Password requirements not met. Please ensure your password:"
+    }
+    
     return res.status(400).json({
       success: false,
-      message: "Validation failed",
-      errors: errors.array(),
+      message: message,
+      errors: errorMessages,
+      passwordRequirements: passwordErrors.length > 0 ? [
+        "Is at least 8 characters long",
+        "Contains at least one lowercase letter (a-z)",
+        "Contains at least one uppercase letter (A-Z)", 
+        "Contains at least one number (0-9)",
+        "Contains at least one special character (@$!%*?&)"
+      ] : undefined
     })
   }
   next()
@@ -18,10 +37,16 @@ export const validateUserRegistration = [
   body("name").trim().isLength({ min: 2, max: 50 }).withMessage("Name must be between 2 and 50 characters"),
   body("email").isEmail().normalizeEmail().withMessage("Please provide a valid email"),
   body("password")
-    .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters long")
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-    .withMessage("Password must contain at least one uppercase letter, one lowercase letter, and one number"),
+    .isLength({ min: 8 })
+    .withMessage("Password must be at least 8 characters long")
+    .matches(/^(?=.*[a-z])/)
+    .withMessage("Password must contain at least one lowercase letter (a-z)")
+    .matches(/^(?=.*[A-Z])/)
+    .withMessage("Password must contain at least one uppercase letter (A-Z)")
+    .matches(/^(?=.*\d)/)
+    .withMessage("Password must contain at least one number (0-9)")
+    .matches(/^(?=.*[@$!%*?&])/)
+    .withMessage("Password must contain at least one special character (@$!%*?&)"),
   handleValidationErrors,
 ]
 

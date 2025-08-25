@@ -18,19 +18,42 @@ export const registerUser = async (req, res) => {
     const userExists = await User.findOne({ email })
 
     if (userExists) {
-      return res.status(400).json({ message: "User already exists" })
+      return res.status(400).json({ 
+        success: false,
+        message: "An account with this email already exists. Please use a different email or try logging in.",
+        field: "email"
+      })
     }
 
     const user = await User.create({ name, email, password }) // password gets hashed by pre-save hook
 
     res.status(201).json({
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      token: generateToken(user._id),
+      success: true,
+      message: "Account created successfully! Welcome to PathCrafter!",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        token: generateToken(user._id),
+      }
     })
   } catch (error) {
-    res.status(500).json({ message: "Registration failed" })
+    console.error("Registration error:", error)
+    
+    // Handle specific MongoDB validation errors
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map(err => err.message)
+      return res.status(400).json({ 
+        success: false,
+        message: "Please check your input and try again.",
+        errors: validationErrors
+      })
+    }
+    
+    res.status(500).json({ 
+      success: false,
+      message: "Registration failed. Please try again later." 
+    })
   }
 }
 
